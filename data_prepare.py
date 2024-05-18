@@ -4,6 +4,8 @@ import pandas as pd
 
 # Path to the downloaded repository
 REPO_PATH = './stm32_gtest_c_code'
+
+
 def get_files_in_directory(directory_path, extensions):
     file_data = []
     for root, _, files in os.walk(directory_path):
@@ -74,8 +76,9 @@ for source_file in source_files:
     if function_names:
         matched_tests = find_test_cases_for_functions(function_names, test_files)
         for test_case in matched_tests:
+            prompt = "Write a Google Test case for the given C function:\n"
             data_pairs.append({
-                'code_snippet': source_content,
+                'code_snippet': prompt + source_content,
                 'test_case': test_case
             })
 
