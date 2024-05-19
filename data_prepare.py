@@ -1,11 +1,10 @@
 import os
 import re
-import pandas as pd
+import json
+from sklearn.model_selection import train_test_split
 
 # Path to the downloaded repository
 REPO_PATH = './stm32_gtest_c_code'
-
-
 def get_files_in_directory(directory_path, extensions):
     file_data = []
     for root, _, files in os.walk(directory_path):
@@ -76,19 +75,27 @@ for source_file in source_files:
     if function_names:
         matched_tests = find_test_cases_for_functions(function_names, test_files)
         for test_case in matched_tests:
-            prompt = "Write a Google Test case for the given C function:\n"
             data_pairs.append({
-                'code_snippet': prompt + source_content,
-                'test_case': test_case
+                'content': source_content,
+                'summary': test_case
             })
 
 print(f"Prepared {len(data_pairs)} data pairs.")
 
-# Create a DataFrame
-df = pd.DataFrame(data_pairs)
+# Split the data into training and testing sets
+train_data, test_data = train_test_split(data_pairs, test_size=0.3, random_state=42)
 
-# Output to CSV
-output_path = 'test_case_generation_data.csv'
-df.to_csv(output_path, index=False)
+# Save to JSON
+train_output_path = 'train_data.json'
+test_output_path = 'test_data.json'
 
-print(f"Data has been successfully saved to {output_path}")
+with open(train_output_path, 'w', encoding='utf-8') as train_file:
+    json.dump(train_data, train_file, indent=4, ensure_ascii=False)
+
+with open(test_output_path, 'w', encoding='utf-8') as test_file:
+    json.dump(test_data, test_file, indent=4, ensure_ascii=False)
+
+print(f"Training data has been successfully saved to {train_output_path}")
+print(f"Testing data has been successfully saved to {test_output_path}")
+
+
